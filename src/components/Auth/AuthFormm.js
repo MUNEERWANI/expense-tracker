@@ -10,7 +10,7 @@ const AuthFormm = () => {
   const authCtx = useContext(AuthContext);
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
-
+  const confirmPasswordInputRef=useRef();
   const submitHandler = (event) => {
 
     event.preventDefault();
@@ -82,6 +82,13 @@ const AuthFormm = () => {
             <label htmlFor='password'>Your Password</label>
             <input type='password' id='password' required ref={passwordInputRef} />
           </div>
+          {!isLogin &&
+            (
+              <div className={classes.control}>
+                <label htmlFor='password'>confirm Password</label>
+                <input type='password' id='password' required ref={confirmPasswordInputRef} />
+              </div>
+            )}
           <div className={classes.actions}>
             {!isLoading && <button type='submit'>{isLogin ? 'Login' : 'Sign up'}</button>}
             <button
