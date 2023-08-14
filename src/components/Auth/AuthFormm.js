@@ -1,6 +1,7 @@
 import React, { useState, useRef, useContext } from 'react';
 import classes from './AuthForm.module.css';
 import AuthContext from '../../store/AuthContext.js';
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -11,10 +12,15 @@ const AuthFormm = () => {
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
   const confirmPasswordInputRef=useRef();
-  const submitHandler = (event) => {
+  const navigate = useNavigate();
 
+
+
+
+  const submitHandler = (event) => {
     event.preventDefault();
     console.log("yes you clicked submit");
+
     const enteredEmail = emailInputRef.current.value;
     const enteredPassword = passwordInputRef.current.value;
 
@@ -58,7 +64,7 @@ const AuthFormm = () => {
         }
       }).then((data) => {
         authCtx.login(data.idToken);
-
+        navigate('/updateprofile'); // Redirect to UpdateProfile
         // history.push('/')
       }).catch((err) => {
         alert(err.message)
