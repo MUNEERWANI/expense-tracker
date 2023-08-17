@@ -23,8 +23,8 @@ const AuthFormm = () => {
 
     const enteredEmail = emailInputRef.current.value;
     const enteredPassword = passwordInputRef.current.value;
+    localStorage.setItem('email',enteredEmail);
 
-    localStorage.setItem('email', enteredEmail);
     setIsLoading(true);
     let url;
 
@@ -64,7 +64,7 @@ const AuthFormm = () => {
         }
       }).then((data) => {
         authCtx.login(data.idToken);
-        navigate('/updateprofile'); // Redirect to UpdateProfile
+        navigate('/expenses'); // Redirect to UpdateProfile
         // history.push('/')
       }).catch((err) => {
         alert(err.message)
@@ -74,7 +74,11 @@ const AuthFormm = () => {
   const switchAuthModeHandler = () => {
     setIsLogin((prevState) => !prevState);
   };
-
+  const forgotPasswordHandler=()=>{
+    console.log('forgot')
+    navigate('/authpasswordchange'); // Redirect to password change  form
+  }
+  
   return (
     <div>
       <section className={classes.auth}>
@@ -96,6 +100,8 @@ const AuthFormm = () => {
               </div>
             )}
           <div className={classes.actions}>
+            <button onClick={forgotPasswordHandler}>Forgot password</button>
+            <br />
             {!isLoading && <button type='submit'>{isLogin ? 'Login' : 'Sign up'}</button>}
             <button
               type='button'

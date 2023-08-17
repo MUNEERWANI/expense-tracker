@@ -13,6 +13,7 @@ const Header = () => {
   const authCtx = useContext(AuthContext)
   const logoutHandler = () => {
     authCtx.logout();
+    localStorage.removeItem('email')
     navigate('/');
   }
   return (
@@ -29,6 +30,7 @@ const Header = () => {
             </Nav>
           </Navbar.Collapse>
         </Container>
+        <Nav.Link as={Link} to="/updateprofile" >Complete profile</Nav.Link>
         <Button variant="warning" className="ml-5"  onClick={logoutHandler} >logout</Button>
 
       </Navbar>
