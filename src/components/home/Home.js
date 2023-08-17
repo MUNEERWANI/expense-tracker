@@ -1,15 +1,17 @@
 import React from 'react'
-import Header from '../navigation/Header';
 import AuthFormm from '../Auth/AuthFormm';
+import { useSelector } from 'react-redux';
+import Expenses from '../expenses/Expenses';
+
 const Home = () => {
+    const isAuth=useSelector(state=>state.auth)
+    const isLoggedIn=isAuth.isLoggedIn
+    console.log(isLoggedIn)
+
     return (
         <div>
-            <Header />
-            <AuthFormm />
+            {!isLoggedIn?(<AuthFormm />):(<Expenses />)}
         </div>
-
-
-
     )
 }
 
