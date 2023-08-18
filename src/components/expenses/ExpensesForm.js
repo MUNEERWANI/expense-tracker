@@ -16,19 +16,28 @@ const ExpensesForm = () => {
     const enteredAmount = useRef();
     const enteredDescription = useRef();
     const [category, setCategory] = useState(null)
-    const [expenseList, setExpenseList] = useState([]);
-    const email = localStorage.getItem('email');
-    const [expenseId, setExpenseId] = useState()
-    console.log(email)
-    const firebaseUrl = "https://expensetracker-a3278-default-rtdb.firebaseio.com";
-
     const handleCategorySelect = (category) => {
         setCategory(category)
     }
+    const [expenseList, setExpenseList] = useState([]);
+    const email2 = localStorage.getItem('email');
+    const email = email2.replace('@', '').replace('.', '');
+    const [editingExpenseId, setEditingExpenseId] = useState()
+    const startEditing = (expenseId) => {
+        setEditingExpenseId(expenseId);
+    };
+
+    const cancelEditing = () => {
+        setEditingExpenseId(null);
+    };
+
+    const firebaseUrl = "https://expensetracker-a3278-default-rtdb.firebaseio.com";
+
+
 
     const fetchExpenses = async () => {
         try {
-            const response = await axios.get(`${firebaseUrl}/expenses.json?auth=${token}`);
+            const response = await axios.get(`${firebaseUrl}/expenses/${email}.json?auth=${token}`);
             const expensesData = response.data;
             console.log(expensesData)
             if (expensesData) {
@@ -37,20 +46,18 @@ const ExpensesForm = () => {
                     ...expensesData[key],
                 }));
                 setExpenseList(expenses);
-                // setExpenseList([...expenseList, { amount, description, category }])
 
             }
         }
         catch (error) {
             console.error('Error fetching expenses:', error);
-
         }
     }
+
     const submitHandler = async (event) => {
         event.preventDefault();
         const amount = enteredAmount.current.value;
         const description = enteredDescription.current.value;
-        console.log(amount, description, category)
         const expenseData = {
             amount: amount,
             description: description,
@@ -59,7 +66,7 @@ const ExpensesForm = () => {
         }
         console.log(expenseData)
         try {
-            const response = await axios.post(`${firebaseUrl}/expenses.json?auth=${token}`, expenseData,
+            const response = await axios.post(`${firebaseUrl}/expenses/${email}.json?auth=${token}`, expenseData,
                 {
                     headers: {
                         'Content-Type': 'application/json'
@@ -83,24 +90,61 @@ const ExpensesForm = () => {
         enteredAmount.current.value = '0';
         enteredDescription.current.value = '';
     }
-    const loadExpenses=
     useEffect(() => {
         fetchExpenses();
 
     }, [])
-    const deleteExpenseHandler = async () => {
+    const deleteExpenseHandler = async (expenseId) => {
         try {
             console.log('delete button')
-            const response = await axios.delete(`${firebaseUrl}/expenses.json?auth=${token}`);
+            const response = await axios.delete(`${firebaseUrl}/expenses/${email}/${expenseId}.json?auth=${token}`);
             console.log('dataa deleted ')
+            console.log(response)
+
+            fetchExpenses(); // Fetch updated expenses
+
         } catch (error) {
             console.log(error)
         }
     }
-    const editExpenseHandler = () => {
+    const editExpenseHandler = async (expenseId) => {
+        const updatedExpense = expenseList.find(expense => expense.id === expenseId);
+        const updatedExpenses = expenseList.map(expense => {
+            if (expense.id === expenseId) {
+                return {
+                    ...expense,
+                    amount: enteredAmount.current.value,
+                    description: enteredDescription.current.value,
+                };
+            }
+            return expense;
+        });
+        setExpenseList(updatedExpenses);
+        const updateExpenseData = {
+            amount: enteredAmount.current.value,
+            description: enteredDescription.current.value,
+            category: updatedExpense.category,
+            email: email,
+        };
+        try {
+            const response = await axios.put(`${firebaseUrl}/expenses/${email}/${expenseId}.json?auth=${token}`, updateExpenseData, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            alert('data updated using ')
+            console.log(response)
+            fetchExpenses(); // Fetch updated expenses
 
+
+        } catch (error) {
+            alert('some error occered in put')
+            console.log(error)
+        }
+        enteredAmount.current.value = '0';
+        enteredDescription.current.value = '';
+        setEditingExpenseId(null);
     }
-
     return (
         <Container>
             <Form onSubmit={submitHandler}>
@@ -132,7 +176,6 @@ const ExpensesForm = () => {
                             <Dropdown.Toggle variant="success" id="dropdown-basic">
                                 Select Expense Category
                             </Dropdown.Toggle>
-
                             <Dropdown.Menu>
                                 <Dropdown.Item onClick={() => handleCategorySelect('Food')}>Food</Dropdown.Item>
                                 <Dropdown.Item onClick={() => handleCategorySelect('Transportation')}>Transportation</Dropdown.Item>
@@ -141,27 +184,46 @@ const ExpensesForm = () => {
                         </Dropdown>
                     </Form.Group>
                 </Row>
-                <Button type="submit">Submit form</Button>
+                <Button type="submit">Add Expense</Button>
             </Form>
             <Container>
-                <h2>Entered Expenses </h2>
+                <h2>Entered Expenses</h2>
                 <ul>
-                    {expenseList.map((expense) => {
-                        return (
-                            <li key={expense.id}>
-                                Amount: {expense.amount},
-                                Description:{expense.description},
-                                Category: {expense.category}
-                                <Button onClick={deleteExpenseHandler}>Delete</Button><span> </span>
-                                <Button onClick={editExpenseHandler}>Edit</Button>
-
-                            </li>
-                        )
-
-                    })}
-
+                    {expenseList.map((expense) => (
+                        <li key={expense.id}>
+                            {editingExpenseId === expense.id ? (
+                                <>
+                                    <Form.Control
+                                        type="number"
+                                        defaultValue={expense.amount}
+                                        ref={enteredAmount}
+                                    />
+                                    <Form.Control
+                                        type="text"
+                                        defaultValue={expense.description}
+                                        ref={enteredDescription}
+                                    />
+                                    <Button onClick={() => editExpenseHandler(expense.id)}>
+                                        Save
+                                    </Button>
+                                    <Button onClick={cancelEditing}>Cancel</Button>
+                                </>
+                            ) : (
+                                <>
+                                    Amount: {expense.amount},
+                                    Description: {expense.description},
+                                    Category: {expense.category}
+                                    <Button onClick={() => deleteExpenseHandler(expense.id)}>
+                                        Delete
+                                    </Button>
+                                    <Button onClick={() => startEditing(expense.id)}>Edit</Button>
+                                </>
+                            )}
+                        </li>
+                    ))}
                 </ul>
             </Container>
+
         </Container>
 
 

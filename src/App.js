@@ -6,17 +6,17 @@ import UpdateProfile from './components/profile/UpdateProfile';
 import CompleteProfile from './components/profile/CompleteProfile';
 import AuthPasswordChange from './components/Auth/AuthPasswordChange';
 import Expenses from './components/expenses/Expenses';
-import { useContext } from 'react';
-import AuthContext from './store/AuthContext';
+import { useSelector } from 'react-redux';
+import Header from './components/navigation/Header';
 
 
 function App() {
-  const authCtx=useContext(AuthContext);
-
-
-  const isLogin=authCtx.login;
+  const isAuth=useSelector(state=>state.auth)
+  console.log(isAuth.token,isAuth.isLoggedIn)
   return (
     <AuthContextProvider >
+                  <Header />
+
     <Routes>
       <Route path="/" element={<Home />}/>
       <Route path='/expenses' element={<Expenses />} />

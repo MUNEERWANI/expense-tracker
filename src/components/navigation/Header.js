@@ -3,17 +3,20 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import { Link } from 'react-router-dom';
-import { useContext } from 'react';
-import AuthContext from '../../store/AuthContext';
 import Button from 'react-bootstrap/esm/Button';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { authActions } from '../../store/index';
+import { useSelector } from 'react-redux';
 
 const Header = () => {
+  const dispatch = useDispatch()
+  const isAuth = useSelector(state => state.auth);
+  const isLoggedIn = isAuth.isLoggedIn;
+  console.log(isLoggedIn)
   const navigate = useNavigate()
-  const authCtx = useContext(AuthContext)
   const logoutHandler = () => {
-    authCtx.logout();
-    localStorage.removeItem('email')
+    dispatch(authActions.logout())
     navigate('/');
   }
   return (
@@ -30,8 +33,13 @@ const Header = () => {
             </Nav>
           </Navbar.Collapse>
         </Container>
-        <Nav.Link as={Link} to="/updateprofile" >Complete profile</Nav.Link>
-        <Button variant="warning" className="ml-5"  onClick={logoutHandler} >logout</Button>
+        {isLoggedIn && (<>
+          <Nav.Link as={Link} to="/updateprofile" >Complete profile</Nav.Link>
+ <Button variant="warning" className="ml-5"  onClick={logoutHandler} >logout</Button>
+        </>
+ 
+        )}
+
 
       </Navbar>
     </div>

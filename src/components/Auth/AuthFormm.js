@@ -1,21 +1,24 @@
-import React, { useState, useRef, useContext } from 'react';
+import React, { useState, useRef } from 'react';
 import classes from './AuthForm.module.css';
-import AuthContext from '../../store/AuthContext.js';
 import { useNavigate } from 'react-router-dom';
-
+import { useDispatch } from 'react-redux';
+import { authActions } from '../../store/index';
 
 
 const AuthFormm = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const authCtx = useContext(AuthContext);
+  const dispatch = useDispatch();
+
+  const [isLogin, setIsLogin] = useState(true); //its used to switch between login page or sign up page
+  const [isLoading, setIsLoading] = useState(false); //its used for laoding where submiting the request
+
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
-  const confirmPasswordInputRef=useRef();
-  const navigate = useNavigate();
-
-
-
+  const confirmPasswordInputRef = useRef();
+  const navigate = useNavigate();// this for getting to another page or navigating to another page
+  const token=localStorage.getItem('token');
+  if(token){
+    dispatch(authActions.login(token))
+  }
 
   const submitHandler = (event) => {
     event.preventDefault();
@@ -23,7 +26,7 @@ const AuthFormm = () => {
 
     const enteredEmail = emailInputRef.current.value;
     const enteredPassword = passwordInputRef.current.value;
-    localStorage.setItem('email',enteredEmail);
+    localStorage.setItem('email', enteredEmail);
 
     setIsLoading(true);
     let url;
@@ -63,22 +66,22 @@ const AuthFormm = () => {
 
         }
       }).then((data) => {
-        authCtx.login(data.idToken);
+        dispatch(authActions.login(data.idToken));
+        console.log(data)
         navigate('/expenses'); // Redirect to UpdateProfile
-        // history.push('/')
       }).catch((err) => {
         alert(err.message)
       })
   };
 
   const switchAuthModeHandler = () => {
-    setIsLogin((prevState) => !prevState);
+    setIsLogin((prevState) => !prevState); //here it  sets the login or sign up button
   };
-  const forgotPasswordHandler=()=>{
+  const forgotPasswordHandler = () => {
     console.log('forgot')
     navigate('/authpasswordchange'); // Redirect to password change  form
   }
-  
+
   return (
     <div>
       <section className={classes.auth}>
