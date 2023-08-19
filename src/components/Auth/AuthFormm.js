@@ -2,8 +2,7 @@ import React, { useState, useRef } from 'react';
 import classes from './AuthForm.module.css';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { authActions } from '../../store/index';
-
+import { authActions } from '../../store/authSlice';
 
 const AuthFormm = () => {
   const dispatch = useDispatch();

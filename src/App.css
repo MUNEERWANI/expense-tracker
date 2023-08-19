@@ -1,0 +1,12 @@
+/* styles.css */
+
+.lightMode {
+    background-color: rgb(255, 250, 250);
+    color: black;
+  }
+  
+  .darkMode {
+    background-color: black;
+    color: white;
+  }
+  
