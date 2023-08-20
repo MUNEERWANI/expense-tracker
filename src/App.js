@@ -1,21 +1,20 @@
 import './App.css';
 import { Route, Routes } from 'react-router-dom';
 import Home from './components/home/Home';
-import AuthContextProvider from './store/AuthContextProvider.js';
 import UpdateProfile from './components/profile/UpdateProfile';
 import CompleteProfile from './components/profile/CompleteProfile';
 import AuthPasswordChange from './components/Auth/AuthPasswordChange';
 import Expenses from './components/expenses/Expenses';
 import { useSelector } from 'react-redux';
 import Header from './components/navigation/Header';
+import { Fragment } from 'react';
  
 function App() {
-  const isAuth = useSelector(state => state.auth)
   const darkMode=useSelector(state=>state.darkMode)
   const themeMode=darkMode.isDarkMode
   return (
-    <div className={themeMode?'lightMode':'darkMode'}>
-      <AuthContextProvider >
+    <div className={!themeMode?'lightMode':'darkMode'}>
+      <Fragment >
         <Header />
         <Routes>
           <Route path="/" element={<Home />} />
@@ -26,7 +25,7 @@ function App() {
           <Route path='/updateprofile' element={<UpdateProfile />} />
           <Route path='/expenses' element={<Expenses />} />
         </Routes>
-      </AuthContextProvider>
+      </Fragment>
     </div>
 
   );

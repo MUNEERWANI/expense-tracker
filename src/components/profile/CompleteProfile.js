@@ -9,7 +9,8 @@ import { useSelector } from 'react-redux';
 
 const CompleteProfile = () => {
     const isAuth = useSelector(state => state.auth)
-    const token=isAuth.token;
+    const token=localStorage.getItem('token')
+    // const token=isAuth.token;
     const nameInputRef = useRef();
     const imageInputRef = useRef();
 
@@ -71,14 +72,16 @@ const CompleteProfile = () => {
         }).then((response) => {
             if (response.ok) {
                 console.log(response);
+                console.log('post to get')
                 return response.json();
             }
-            throw new Error("Failed to fetch user data");
+            // throw new Error("Failed to fetch user data");
         }).then((data) => {
+            console.log('i m data', data)
             const user = data.users[0];
             if (user) {
                 setUserData({
-                    displayName: user.displayName || '',
+                    // displayName: user.displayName || '',
                     photoUrl: user.photoUrl || ''
                 })
             }
@@ -105,6 +108,7 @@ const CompleteProfile = () => {
             }
             const data = await response.json();
             console.log(data);
+            alert('Code sent on email kindly check');
             return data
         } catch (error) {
             console.log(error);
